@@ -3,6 +3,7 @@ from newspaper import Article
 from newspaper import Config
 import pandas as pd
 import nltk
+from datetime import datetime
 
 class DataCollector:
 
@@ -20,6 +21,7 @@ class DataCollector:
         self.googlenews_client = GoogleNews(start=self.start_time,
                                             end=self.end_time)
         self.news_df = None
+        self.link_filter_list = ['seekingalpha']
 
     def search_news(self, max_page=10):
         news_list = list()
@@ -39,19 +41,26 @@ class DataCollector:
         # get text from links
         content_list = list()
         for ind in temp_df.index:
+            article_link = temp_df['link'][ind]
+            if any(link_filter in article_link 
+                    for link_filter in self.link_filter_list):
+                continue
             try:
                 record_dict = dict()
-                article = Article(temp_df['link'][ind], config=self.config)
+                article = Article(article_link, config=self.config)
                 article.download()
                 article.parse()
                 article.nlp()
-                record_dict['Date']=temp_df['date'][ind]
-                record_dict['Media']=temp_df['media'][ind]
-                record_dict['Title']=article.title
-                record_dict['Article']=article.text
-                record_dict['Summary']=article.summary
+                record_dict['Date'] = temp_df['date'][ind]
+                record_dict['Media'] = temp_df['media'][ind]
+                record_dict['Title'] = article.title
+                record_dict['Article'] = article.text
+                record_dict['Summary'] = article.summary
+                record_dict['Link'] = article_link
                 content_list.append(record_dict)
             except:
                 print('Can\'t fetch article: {:s}'.format(temp_df['link'][ind]))
         self.news_df = pd.DataFrame(content_list)
-
+        self.news_df['Date'] = pd.to_datetime(self.news_df.Date).dt.date
+        self.news_df = self.news_df.sort_values(by='Date', ignore_index=True)
+        
