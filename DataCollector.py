@@ -1,24 +1,24 @@
-from GoogleNews import GoogleNews
-from newspaper import Article
-from newspaper import Config
-import pandas as pd
-import nltk
-from datetime import datetime
-import yfinance as yf
 import json
+from datetime import datetime
+
+import nltk
+import pandas as pd
+import yfinance as yf
+from GoogleNews import GoogleNews
+from newspaper import Article, Config
 
 
 class DataCollector:
 
-    def __init__(self, ticker, keywords_list, start_time, end_time):
-        
+    def __init__(self, ticker, start_time, end_time):
+
         # configure for news downloading agent
         nltk.download('punkt')
         user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) \
             AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'
         self.config = Config()
         self.config.browser_user_agent = user_agent
-        
+
         self.ticker = ticker
         self.price_df = None
         self.keywords_dict = None
@@ -34,7 +34,7 @@ class DataCollector:
 
     @staticmethod
     def gnews_date_fmt(date_in):
-        return datetime.strftime(datetime.strptime(date_in, '%Y-%m-%d'), 
+        return datetime.strftime(datetime.strptime(date_in, '%Y-%m-%d'),
                                  '%m/%d/%Y')
 
     def search_news(self, max_page=10):
@@ -55,7 +55,7 @@ class DataCollector:
         content_list = list()
         for ind in temp_df.index:
             article_link = temp_df['link'][ind]
-            if any(link_filter in article_link 
+            if any(link_filter in article_link
                     for link_filter in self.link_filter_list):
                 continue
             try:
@@ -63,21 +63,28 @@ class DataCollector:
                 article = Article(article_link, config=self.config)
                 article.download()
                 article.parse()
-                record_dict = { 'Date': temp_df['date'][ind],
-                                'Media': temp_df['media'][ind],
-                                'Title':article.title,
-                                'Article': article.text,
-                                'Link': article_link }
+                record_dict = {'Date': temp_df['date'][ind],
+                               'Media': temp_df['media'][ind],
+                               'Title': article.title,
+                               'Article': article.text,
+                               'Link': article_link}
                 content_list.append(record_dict)
             except:
-                print('Can\'t fetch article: {:s}'.format(temp_df['link'][ind]))
+                print('Can\'t fetch article: {:s}'.format(
+                    temp_df['link'][ind]))
         self.news_df = pd.DataFrame(content_list)
         self.news_df['Date'] = pd.to_datetime(self.news_df.Date).dt.date
         self.news_df = self.news_df.sort_values(by='Date', ignore_index=True)
         self.news_df.reset_index()
-    
+
     def search_stock_price(self):
         self.price_df = yf.download(self.ticker,
                                     start=self.start_time,
                                     end=self.end_time,
                                     group_by='ticker')
+
+    def to_isocalendar():
+        pass
+
+    def from_isocalendar():
+        pass
