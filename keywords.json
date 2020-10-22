@@ -1,0 +1,13 @@
+{   
+    "AAPL": ["AAPL", "Apple Stock"],
+    "MSFT": ["MSFT", "Microsoft Company Stock"],
+    "AMZN": ["AMZN", "Amazon Stock"],
+    "GOOG": ["GOOG"],
+    "FB": ["FB"],
+    "WMT": ["WMT"],
+    "JNJ": ["JNJ"],
+    "PG": ["PG"],
+    "NVDA": ["NVDA"],
+    "UNH":["UNH"],
+    "JPM": ["JPM", "JP Morgan"]
+}
