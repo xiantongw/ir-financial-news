@@ -82,9 +82,3 @@ class DataCollector:
                                     start=self.start_time,
                                     end=self.end_time,
                                     group_by='ticker')
-
-    def to_isocalendar():
-        pass
-
-    def from_isocalendar():
-        pass
