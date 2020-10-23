@@ -1,5 +1,8 @@
 import os
 from datetime import date, datetime
+import time
+
+from tqdm import tqdm
 
 from DataCollector import *
 
@@ -42,4 +45,13 @@ def download_news_by_week(ticker_in, iso_week_str):
 
 
 if __name__ == '__main__':
-    download_news_by_week('JPM', '2013-W23')
+    # generate the list of years and weeks
+    week_list = list()
+    for year in range(2010, 2020):
+        for week in range(1, num_iso_week(year) + 1):
+            week_list.append('{:d}-W{:d}'.format(year, week))
+    pbar = tqdm(week_list, ncols=120)
+    for week_str in pbar:
+        pbar.set_description(week_str)
+        download_news_by_week('JPM', week_str)
+        time.sleep(30)
