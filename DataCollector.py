@@ -73,9 +73,6 @@ class DataCollector:
                 print('Can\'t fetch article: {:s}'.format(
                     temp_df['link'][ind]))
         self.news_df = pd.DataFrame(content_list)
-        self.news_df['Date'] = pd.to_datetime(self.news_df.Date).dt.date
-        self.news_df = self.news_df.sort_values(by='Date', ignore_index=True)
-        self.news_df.reset_index()
 
     def search_stock_price(self):
         self.price_df = yf.download(self.ticker,
